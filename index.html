@@ -2573,6 +2573,7 @@
         }
         .size-slider-container input[type="range"] {
             -webkit-appearance: none;
+            appearance: none;
             width: 120px;
             height: 6px;
             border-radius: 3px;
@@ -3031,7 +3032,6 @@
                 font-size: 11px;
             }
         }
-    }
     
     /* 作业统计样式 */
     .stats-container {
@@ -3187,8 +3187,9 @@
         padding: 24px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         margin-top: 20px;
-        flex: 1;
-        min-height: 200px;
+        height: calc(100vh - 300px);
+        min-height: 300px;
+        max-height: 700px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -3201,12 +3202,12 @@
     }
     
     .homework-time-node {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
+        display: block;
         width: 100%;
-        overflow-x: hidden;
+        height: 100%;
         overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 10px;
     }
     
     .homework-time-node::-webkit-scrollbar {
@@ -3917,8 +3918,6 @@
         }
     }
     
-    }
-    
     .student-number {
         font-size: 18px;
         font-weight: 900;
@@ -4244,16 +4243,15 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; flex-shrink: 0;">
                     <h3 style="margin: 0;">📅 作业列表 <span id="homeworkFilterHint" style="font-size: 12px; color: var(--text-sub); font-weight: normal;">（今日）</span></h3>
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <button id="showAllHomeworkBtn" onclick="toggleShowAllHomework()" style="padding: 8px 16px; border-radius: 8px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer;">显示全部</button>
                         <input type="date" id="homeworkFilterDate" onchange="filterHomeworkByDate()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px;">
-                        <button onclick="clearHomeworkFilter()" style="padding: 8px 16px; border-radius: 8px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer;">清除筛选</button>
+                        <button onclick="clearHomeworkFilter()" style="padding: 8px 16px; border-radius: 8px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer;">重置为今日</button>
                     </div>
                 </div>
-                <div class="homework-time-node" id="homeworkList" style="flex: 1; overflow-y: auto;">
+                <div class="homework-time-node" id="homeworkList">
                     <!-- 作业列表将通过JS动态生成 -->
                 </div>
                 <!-- 分页控件 -->
-                <div id="homeworkPagination" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; flex-shrink: 0;">
+                <div id="homeworkPagination" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; flex-shrink: 0; padding: 10px 0;">
                     <!-- 分页按钮将通过JS动态生成 -->
                 </div>
             </div>
@@ -4443,8 +4441,14 @@
             <!-- 积分排行Tab -->
             <div id="rankTabContent" class="rank-tab-content" style="display: block;">
                 <div class="rank-panel" style="max-width: 800px; margin: 0 auto;">
-                    <div class="panel-title">🏆 本班积分排行 TOP10</div>
-                    <div id="personalRankList"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                        <div class="panel-title" style="margin: 0;">🏆 本班积分排行</div>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="rankTop10Btn" onclick="switchRankView('top10')" style="padding: 8px 16px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 14px;">前十</button>
+                            <button id="rankAllBtn" onclick="switchRankView('all')" style="padding: 8px 16px; border: none; border-radius: 8px; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer; font-size: 14px;">全部</button>
+                        </div>
+                    </div>
+                    <div id="personalRankList" style="max-height: 60vh; overflow-y: auto;"></div>
                 </div>
             </div>
             <!-- 积分商店Tab -->
@@ -4965,18 +4969,6 @@
 
     <div id="toast" class="toast">操作成功</div>
     
-    <!-- 自定义确认对话框 -->
-    <div id="confirmDialog" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 10001; justify-content: center; align-items: center;">
-        <div style="background: white; border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
-            <div style="font-size: 18px; font-weight: 900; color: #1F2937; margin-bottom: 16px;">⚠️ 确认删除</div>
-            <div id="confirmMessage" style="font-size: 14px; color: #6B7280; margin-bottom: 24px;">确定要删除这个作业吗？此操作无法撤销。</div>
-            <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                <button onclick="closeConfirmDialog(false)" style="padding: 10px 20px; border-radius: 8px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer;">取消</button>
-                <button id="confirmBtn" onclick="closeConfirmDialog(true)" style="padding: 10px 20px; border-radius: 8px; border: none; background: #EF4444; color: white; font-weight: bold; cursor: pointer;">确认删除</button>
-            </div>
-        </div>
-    </div>
-
     <!-- ================= 核心 JS 逻辑 ================= -->
     <script>
         
@@ -5066,78 +5058,50 @@
 
         // ================= 优化的存储系统 =================
         const DB_NAME = 'ClassroomPetSystem';
-        const DB_VERSION = 2; // 升级版本
-        const DB_KEY = 'classroom_v9_multispecies';
-        const CACHE_TTL = 5 * 60 * 1000; // 5分钟缓存
-        const DEBOUNCE_DELAY = 1000; // 1秒防抖
+        const DB_VERSION = 3; // 升级版本支持图片分离
+        const DB_KEY = 'classroom_v10_optimized';
+        const DB_KEY_IMAGES = 'classroom_v10_images'; // 图片单独存储
+        const CACHE_TTL = 10 * 60 * 1000; // 10分钟缓存
+        const DEBOUNCE_DELAY = 3000; // 3秒防抖
+        const AUTO_SAVE_INTERVAL = 30000; // 30秒自动保存
 
-        // 存储类
+        // 存储类 - 优化版
         class OptimizedStorage {
             constructor() {
                 this.db = null;
                 this.memoryCache = new Map();
                 this.cacheExpiry = new Map();
                 this.debounceMap = new Map();
-                this.encryptionKey = this.generateEncryptionKey();
-            }
-
-            // 生成加密密钥
-            generateEncryptionKey() {
-                const key = localStorage.getItem('encryption_key');
-                if (key) return key;
-                const newKey = Math.random().toString(36).substring(2, 15);
-                localStorage.setItem('encryption_key', newKey);
-                return newKey;
-            }
-
-            // 简单加密
-            encrypt(data) {
-                try {
-                    const jsonStr = JSON.stringify(data);
-                    let encrypted = '';
-                    for (let i = 0; i < jsonStr.length; i++) {
-                        const charCode = jsonStr.charCodeAt(i) ^ this.encryptionKey.charCodeAt(i % this.encryptionKey.length);
-                        encrypted += String.fromCharCode(charCode);
-                    }
-                    return btoa(encrypted);
-                } catch (e) {
-                    console.warn('加密失败:', e);
-                    return btoa(JSON.stringify(data));
-                }
-            }
-
-            // 简单解密
-            decrypt(encrypted) {
-                try {
-                    const decrypted = atob(encrypted);
-                    let jsonStr = '';
-                    for (let i = 0; i < decrypted.length; i++) {
-                        const charCode = decrypted.charCodeAt(i) ^ this.encryptionKey.charCodeAt(i % this.encryptionKey.length);
-                        jsonStr += String.fromCharCode(charCode);
-                    }
-                    return JSON.parse(jsonStr);
-                } catch (e) {
-                    console.warn('解密失败:', e);
-                    return JSON.parse(atob(encrypted));
-                }
+                this.lastSavedData = null; // 用于增量比较
+                this.pendingChanges = new Set(); // 待保存的变更字段
+                this.isInitialized = false;
             }
 
             // 初始化数据库
             async init() {
+                if (this.isInitialized && this.db) return this.db;
+                
                 return new Promise((resolve, reject) => {
                     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => {
                         this.db = request.result;
+                        this.isInitialized = true;
                         resolve(this.db);
                     };
 
                     request.onupgradeneeded = (event) => {
                         const db = event.target.result;
+                        // 主数据存储
                         if (!db.objectStoreNames.contains('data')) {
                             const store = db.createObjectStore('data', { keyPath: 'id' });
                             store.createIndex('byTimestamp', 'timestamp', { unique: false });
+                        }
+                        // 图片存储（分离）
+                        if (!db.objectStoreNames.contains('images')) {
+                            const imgStore = db.createObjectStore('images', { keyPath: 'id' });
+                            imgStore.createIndex('byTimestamp', 'timestamp', { unique: false });
                         }
                     };
                 });
@@ -5161,53 +5125,138 @@
             }
 
             // 防抖存储
-            debouncedSave(key, data) {
+            debouncedSave(key, data, immediate = false) {
+                if (immediate) {
+                    clearTimeout(this.debounceMap.get(key));
+                    return this.saveData(key, data);
+                }
+                
                 clearTimeout(this.debounceMap.get(key));
                 this.debounceMap.set(key, setTimeout(async () => {
                     await this.saveData(key, data);
                 }, DEBOUNCE_DELAY));
             }
 
-            // 保存数据
+            // 提取图片数据（分离存储）
+            extractImages(data) {
+                const images = {};
+                const dataWithoutImages = JSON.parse(JSON.stringify(data));
+                
+                // 提取宠物图片
+                if (dataWithoutImages.petSpecies) {
+                    dataWithoutImages.petSpecies.forEach(species => {
+                        if (species.stages) {
+                            Object.keys(species.stages).forEach(stageKey => {
+                                const stage = species.stages[stageKey];
+                                if (stage.img && stage.img.length > 100) {
+                                    const imgKey = `${species.id}_${stageKey}`;
+                                    images[imgKey] = stage.img;
+                                    stage.img = `ref:${imgKey}`; // 用引用替换
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                return { dataWithoutImages, images };
+            }
+
+            // 合并图片数据
+            mergeImages(data, images) {
+                if (!data.petSpecies || !images) return data;
+                
+                const mergedData = JSON.parse(JSON.stringify(data));
+                mergedData.petSpecies.forEach(species => {
+                    if (species.stages) {
+                        Object.keys(species.stages).forEach(stageKey => {
+                            const stage = species.stages[stageKey];
+                            if (stage.img && stage.img.startsWith('ref:')) {
+                                const imgKey = stage.img.substring(4);
+                                stage.img = images[imgKey] || null;
+                            }
+                        });
+                    }
+                });
+                
+                return mergedData;
+            }
+
+            // 保存数据（优化版）
             async saveData(key, data) {
                 try {
                     if (!this.db) await this.init();
                     
-                    const transaction = this.db.transaction(['data'], 'readwrite');
-                    const store = transaction.objectStore('data');
-                    const encryptedData = this.encrypt(data);
-                    const request = store.put({ 
-                        id: key, 
-                        data: encryptedData, 
-                        timestamp: Date.now() 
-                    });
-
-                    return new Promise((resolve, reject) => {
-                        request.onsuccess = () => {
-                            this.setToCache(key, data);
-                            // 备份到localStorage
-                            try {
-                                localStorage.setItem(`${key}_backup`, JSON.stringify(data));
-                            } catch (e) {
-                                console.warn('备份失败:', e);
-                            }
-                            resolve();
-                        };
+                    // 分离图片
+                    const { dataWithoutImages, images } = this.extractImages(data);
+                    
+                    const transaction = this.db.transaction(['data', 'images'], 'readwrite');
+                    const dataStore = transaction.objectStore('data');
+                    const imageStore = transaction.objectStore('images');
+                    
+                    // 保存主数据（不含图片，更小更快）
+                    const dataPromise = new Promise((resolve, reject) => {
+                        const request = dataStore.put({ 
+                            id: key, 
+                            data: dataWithoutImages, 
+                            timestamp: Date.now() 
+                        });
+                        request.onsuccess = () => resolve();
                         request.onerror = () => reject(request.error);
                     });
-                } catch (e) {
-                    console.warn('保存到 IndexedDB 失败，尝试保存到 localStorage:', e);
+                    
+                    // 保存图片数据（分离存储）
+                    const imagePromise = new Promise((resolve, reject) => {
+                        const request = imageStore.put({ 
+                            id: `${key}_images`, 
+                            data: images, 
+                            timestamp: Date.now() 
+                        });
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    });
+                    
+                    await Promise.all([dataPromise, imagePromise]);
+                    
+                    // 更新缓存
+                    this.setToCache(key, data);
+                    this.setToCache(`${key}_images`, images);
+                    
+                    // 仅保存关键数据到localStorage作为备份（不含图片）
                     try {
-                        localStorage.setItem(key, JSON.stringify(data));
-                        this.setToCache(key, data);
-                    } catch (e2) {
-                        console.warn('保存到 localStorage 也失败:', e2);
-                        throw e2;
+                        const backupData = {
+                            classes: data.classes,
+                            currentClassId: data.currentClassId,
+                            rules: data.rules,
+                            store: data.store,
+                            thresholds: data.thresholds,
+                            homeworks: data.homeworks
+                        };
+                        localStorage.setItem(`${key}_backup`, JSON.stringify(backupData));
+                    } catch (e) {
+                        console.warn('备份失败:', e);
                     }
+                    
+                    return true;
+                } catch (e) {
+                    console.warn('保存失败，尝试localStorage:', e);
+                    return this.saveToLocalStorage(key, data);
                 }
             }
 
-            // 加载数据
+            // localStorage备用存储
+            saveToLocalStorage(key, data) {
+                try {
+                    const { dataWithoutImages } = this.extractImages(data);
+                    localStorage.setItem(key, JSON.stringify(dataWithoutImages));
+                    this.setToCache(key, data);
+                    return true;
+                } catch (e) {
+                    console.error('localStorage保存也失败:', e);
+                    return false;
+                }
+            }
+
+            // 加载数据（优化版）
             async loadData(key) {
                 // 先从内存缓存读取
                 const cached = this.getFromCache(key);
@@ -5216,32 +5265,37 @@
                 try {
                     if (!this.db) await this.init();
                     
-                    const transaction = this.db.transaction(['data'], 'readonly');
-                    const store = transaction.objectStore('data');
-                    const request = store.get(key);
-
-                    return new Promise((resolve, reject) => {
-                        request.onsuccess = () => {
-                            const result = request.result;
-                            if (result) {
-                                try {
-                                    const decryptedData = this.decrypt(result.data);
-                                    this.setToCache(key, decryptedData);
-                                    resolve(decryptedData);
-                                } catch (e) {
-                                    console.warn('解密失败，尝试从备份读取:', e);
-                                    this.loadFromBackup(key).then(resolve).catch(reject);
-                                }
-                            } else {
-                                this.loadFromBackup(key).then(resolve).catch(reject);
-                            }
-                        };
-                        request.onerror = () => {
-                            this.loadFromBackup(key).then(resolve).catch(reject);
-                        };
-                    });
+                    const transaction = this.db.transaction(['data', 'images'], 'readonly');
+                    const dataStore = transaction.objectStore('data');
+                    const imageStore = transaction.objectStore('images');
+                    
+                    // 并行加载主数据和图片
+                    const [dataResult, imageResult] = await Promise.all([
+                        new Promise((resolve, reject) => {
+                            const request = dataStore.get(key);
+                            request.onsuccess = () => resolve(request.result);
+                            request.onerror = () => reject(request.error);
+                        }),
+                        new Promise((resolve, reject) => {
+                            const request = imageStore.get(`${key}_images`);
+                            request.onsuccess = () => resolve(request.result);
+                            request.onerror = () => resolve(null);
+                        })
+                    ]);
+                    
+                    if (dataResult) {
+                        let data = dataResult.data;
+                        // 合并图片
+                        if (imageResult && imageResult.data) {
+                            data = this.mergeImages(data, imageResult.data);
+                        }
+                        this.setToCache(key, data);
+                        return data;
+                    }
+                    
+                    return this.loadFromBackup(key);
                 } catch (e) {
-                    console.warn('读取 IndexedDB 失败，尝试从备份读取:', e);
+                    console.warn('加载失败，从备份读取:', e);
                     return this.loadFromBackup(key);
                 }
             }
@@ -5249,14 +5303,12 @@
             // 从备份加载
             async loadFromBackup(key) {
                 try {
-                    // 尝试从localStorage读取
                     const stored = localStorage.getItem(key);
                     if (stored && stored !== 'null' && stored !== 'undefined') {
                         const data = JSON.parse(stored);
                         this.setToCache(key, data);
                         return data;
                     }
-                    // 尝试从备份读取
                     const backup = localStorage.getItem(`${key}_backup`);
                     if (backup && backup !== 'null' && backup !== 'undefined') {
                         const data = JSON.parse(backup);
@@ -5270,98 +5322,62 @@
                 }
             }
 
-            // 批量操作
-            async batchSave(items) {
-                if (!this.db) await this.init();
-                
-                const transaction = this.db.transaction(['data'], 'readwrite');
-                const store = transaction.objectStore('data');
-                
-                const promises = items.map(({ key, data }) => {
-                    return new Promise((resolve, reject) => {
-                        const encryptedData = this.encrypt(data);
-                        const request = store.put({ 
-                            id: key, 
-                            data: encryptedData, 
-                            timestamp: Date.now() 
-                        });
-                        request.onsuccess = () => {
-                            this.setToCache(key, data);
-                            resolve();
-                        };
-                        request.onerror = () => reject(request.error);
-                    });
-                });
-                
-                return Promise.all(promises);
-            }
-
             // 清理过期数据
             async cleanupOldData(daysToKeep = 30) {
                 if (!this.db) await this.init();
                 
                 const cutoffTime = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
                 
-                const transaction = this.db.transaction(['data'], 'readwrite');
-                const store = transaction.objectStore('data');
-                const index = store.index('byTimestamp');
+                const transaction = this.db.transaction(['data', 'images'], 'readwrite');
+                const dataStore = transaction.objectStore('data');
+                const imageStore = transaction.objectStore('images');
                 
-                const request = index.openCursor(IDBKeyRange.upperBound(cutoffTime));
-                
-                return new Promise((resolve, reject) => {
-                    request.onsuccess = (event) => {
-                        const cursor = event.target.result;
-                        if (cursor) {
-                            cursor.delete();
-                            cursor.continue();
-                        } else {
-                            resolve();
-                        }
-                    };
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            // 导出所有数据
-            async exportAll() {
-                if (!this.db) await this.init();
-                
-                const transaction = this.db.transaction(['data'], 'readonly');
-                const store = transaction.objectStore('data');
-                const request = store.getAll();
-                
-                return new Promise((resolve, reject) => {
-                    request.onsuccess = () => {
-                        const data = {};
-                        request.result.forEach(item => {
-                            try {
-                                data[item.id] = this.decrypt(item.data);
-                            } catch (e) {
-                                console.warn('解密失败:', e);
+                const cleanupStore = (store) => {
+                    return new Promise((resolve) => {
+                        const index = store.index('byTimestamp');
+                        const request = index.openCursor(IDBKeyRange.upperBound(cutoffTime));
+                        let count = 0;
+                        request.onsuccess = (event) => {
+                            const cursor = event.target.result;
+                            if (cursor) {
+                                cursor.delete();
+                                count++;
+                                cursor.continue();
+                            } else {
+                                resolve(count);
                             }
-                        });
-                        resolve(data);
-                    };
-                    request.onerror = () => reject(request.error);
-                });
+                        };
+                        request.onerror = () => resolve(0);
+                    });
+                };
+                
+                const [dataCount, imageCount] = await Promise.all([
+                    cleanupStore(dataStore),
+                    cleanupStore(imageStore)
+                ]);
+                
+                return dataCount + imageCount;
             }
         }
 
         const storage = new OptimizedStorage();
 
         // ================= 数据迁移功能 =================
-        async function migrateFromLocalStorage() {
+        async function migrateFromOldVersion() {
             try {
-                const localStorageData = localStorage.getItem(DB_KEY);
-                if (!localStorageData || localStorageData === 'null' || localStorageData === 'undefined') {
-                    return null;
+                // 尝试从旧版本迁移
+                const oldKeys = ['classroom_v9_multispecies', 'classroom_v8_data', 'classroom_data'];
+                for (const oldKey of oldKeys) {
+                    const oldData = localStorage.getItem(oldKey);
+                    if (oldData && oldData !== 'null' && oldData !== 'undefined') {
+                        const data = JSON.parse(oldData);
+                        await storage.saveData(DB_KEY, data);
+                        localStorage.removeItem(oldKey);
+                        console.log(`✅ 数据已从 ${oldKey} 迁移到新版本`);
+                        return data;
+                    }
                 }
-
-                const data = JSON.parse(localStorageData);
-                await storage.saveData(DB_KEY, data);
-                localStorage.removeItem(DB_KEY);
-                console.log('✅ 数据已从 localStorage 迁移到 IndexedDB');
-                return data;
+                return null;
             } catch (e) {
                 console.warn('数据迁移失败:', e);
                 return null;
@@ -5423,14 +5439,64 @@
             adjustCardSize(currentCardScale);
         }
         
+        // 显示加载进度
+        function showLoadingProgress(message) {
+            let loader = document.getElementById('loadingOverlay');
+            if (!loader) {
+                loader = document.createElement('div');
+                loader.id = 'loadingOverlay';
+                loader.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    display: flex; flex-direction: column; align-items: center; justify-content: center;
+                    z-index: 99999; color: white;
+                `;
+                loader.innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 20px;">🐾</div>
+                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">班级积分管理系统</div>
+                    <div id="loadingMessage" style="font-size: 16px; opacity: 0.8;">${message}</div>
+                    <div style="margin-top: 20px; width: 200px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden;">
+                        <div id="loadingBar" style="width: 0%; height: 100%; background: white; transition: width 0.3s;"></div>
+                    </div>
+                `;
+                document.body.appendChild(loader);
+            }
+            const msgEl = document.getElementById('loadingMessage');
+            if (msgEl) msgEl.textContent = message;
+            return loader;
+        }
+        
+        function updateLoadingProgress(percent, message) {
+            const bar = document.getElementById('loadingBar');
+            const msg = document.getElementById('loadingMessage');
+            if (bar) bar.style.width = `${percent}%`;
+            if (msg && message) msg.textContent = message;
+        }
+        
+        function hideLoadingProgress() {
+            const loader = document.getElementById('loadingOverlay');
+            if (loader) {
+                loader.style.opacity = '0';
+                loader.style.transition = 'opacity 0.3s';
+                setTimeout(() => loader.remove(), 300);
+            }
+        }
+        
         async function loadData() {
+            showLoadingProgress('正在初始化存储系统...');
+            updateLoadingProgress(10);
+            
             try {
+                updateLoadingProgress(20, '正在加载数据...');
                 let data = await storage.loadData(DB_KEY);
+                
                 if (!data) {
-                    data = await migrateFromLocalStorage();
+                    updateLoadingProgress(40, '正在检查旧版本数据...');
+                    data = await migrateFromOldVersion();
                 }
+                
+                updateLoadingProgress(60, '正在验证数据...');
                 if (data && data !== 'null' && data !== 'undefined') {
-                    // 验证数据
                     const validation = validateData(data);
                     if (!validation.valid) {
                         console.warn('数据验证失败，尝试修复:', validation.error);
@@ -5443,10 +5509,17 @@
                         console.warn('数据修复失败，使用默认数据');
                         globalData = createDefaultData();
                     }
+                } else {
+                    updateLoadingProgress(80, '正在创建默认数据...');
+                    globalData = createDefaultData();
                 }
+                
+                updateLoadingProgress(100, '加载完成！');
+                setTimeout(hideLoadingProgress, 300);
             } catch (e) {
                 console.warn('加载数据失败:', e);
-                globalData = null;
+                globalData = createDefaultData();
+                hideLoadingProgress();
             }
         }
 
@@ -5561,6 +5634,12 @@
             
             // 设置自动数据清理
             setupAutoCleanup();
+            
+            // 启动自动保存
+            startAutoSave();
+            
+            // 设置页面卸载前保存
+            setupBeforeUnload();
         }
         
         // 同步宠物种类数据
@@ -5688,36 +5767,97 @@
             return data;
         }
 
+        let saveTimeout = null;
+        let lastSaveTime = 0;
+        const MIN_SAVE_INTERVAL = 2000; // 最小保存间隔2秒
+
         async function saveData() {
             try {
                 // 验证数据
                 const validation = validateData(globalData);
                 if (!validation.valid) {
                     console.warn('数据验证失败:', validation.error);
-                    // 尝试修复数据
                     globalData = repairData(globalData);
                     if (!globalData) {
                         return showToast('❌ 数据保存失败：数据格式错误');
                     }
                 }
                 
-                // 使用防抖存储，提高性能
-                storage.debouncedSave(DB_KEY, globalData);
+                // 检查最小保存间隔
+                const now = Date.now();
+                if (now - lastSaveTime < MIN_SAVE_INTERVAL) {
+                    // 使用防抖
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(() => {
+                        storage.debouncedSave(DB_KEY, globalData);
+                        lastSaveTime = Date.now();
+                    }, DEBOUNCE_DELAY);
+                } else {
+                    // 直接保存
+                    storage.debouncedSave(DB_KEY, globalData);
+                    lastSaveTime = now;
+                }
             } catch (e) {
                 console.warn('保存数据失败:', e);
-                showToast('❌ 数据保存失败');
             }
         }
 
         // 立即保存（不使用防抖）
         async function saveDataImmediately() {
             try {
+                console.log('=== saveDataImmediately START ===');
+                console.log('当前班级学生数据:', getCurrentClass()?.students?.map(s => ({ id: s.id, name: s.name, studentId: s.studentId })));
+                
                 await storage.saveData(DB_KEY, globalData);
+                lastSaveTime = Date.now();
+                
+                console.log('=== saveDataImmediately END ===');
                 return true;
             } catch (e) {
                 console.warn('立即保存失败:', e);
                 return false;
             }
+        }
+
+        // 自动保存
+        let autoSaveInterval = null;
+        function startAutoSave() {
+            if (autoSaveInterval) return;
+            autoSaveInterval = setInterval(async () => {
+                if (globalData) {
+                    console.log('🔄 自动保存...');
+                    await storage.debouncedSave(DB_KEY, globalData, true);
+                }
+            }, AUTO_SAVE_INTERVAL);
+        }
+
+        // 页面卸载前保存
+        function setupBeforeUnload() {
+            window.addEventListener('beforeunload', async (e) => {
+                if (globalData) {
+                    // 同步保存到localStorage作为紧急备份
+                    try {
+                        const backupData = {
+                            classes: globalData.classes,
+                            currentClassId: globalData.currentClassId,
+                            rules: globalData.rules,
+                            store: globalData.store,
+                            thresholds: globalData.thresholds,
+                            homeworks: globalData.homeworks
+                        };
+                        localStorage.setItem(`${DB_KEY}_emergency`, JSON.stringify(backupData));
+                    } catch (err) {
+                        console.warn('紧急备份失败:', err);
+                    }
+                }
+            });
+            
+            // 页面可见性变化时保存
+            document.addEventListener('visibilitychange', async () => {
+                if (document.visibilityState === 'hidden' && globalData) {
+                    await saveDataImmediately();
+                }
+            });
         }
 
         // 定期清理过期数据
@@ -6497,22 +6637,38 @@
             const cls = getCurrentClass();
             if (!cls) return showToast('未找到当前班级！');
             
-            // 获取作业数据
-            const key = `homeworks_${cls.id}`;
-            const stored = localStorage.getItem(key);
-            const homeworks = stored ? JSON.parse(stored) : [];
+            // 从 globalData 获取作业数据
+            if (!globalData.homeworks || !globalData.homeworks[cls.id]) {
+                return showToast('作业数据不存在！');
+            }
             
             // 找到要编辑的作业
-            const homework = homeworks.find(hw => hw.id === id);
+            const homework = globalData.homeworks[cls.id].find(hw => hw.id === id);
             if (!homework) return showToast('作业不存在！');
+            
+            // 先更新学科选择器选项
+            updateSubjectSelectors();
             
             // 填充编辑表单
             document.getElementById('editHomeworkId').value = homework.id;
-            document.getElementById('editHomeworkSubject').value = homework.subject;
-            document.getElementById('editHomeworkName').value = homework.name;
-            document.getElementById('editHomeworkAssignTime').value = homework.assignTime;
-            document.getElementById('editHomeworkDeadline').value = homework.deadline;
-            document.getElementById('editHomeworkDescription').value = homework.description;
+            document.getElementById('editHomeworkName').value = homework.name || '';
+            document.getElementById('editHomeworkAssignTime').value = homework.assignTime || '';
+            document.getElementById('editHomeworkDescription').value = homework.description || '';
+            
+            // 设置学科选择器的值（在更新选项后）
+            const subjectSelect = document.getElementById('editHomeworkSubject');
+            if (subjectSelect && homework.subject) {
+                // 检查选项是否存在
+                const optionExists = Array.from(subjectSelect.options).some(opt => opt.value === homework.subject);
+                if (optionExists) {
+                    subjectSelect.value = homework.subject;
+                } else {
+                    // 如果选项不存在，选择第一个
+                    if (subjectSelect.options.length > 0) {
+                        subjectSelect.selectedIndex = 0;
+                    }
+                }
+            }
             
             // 打开编辑模态框
             document.getElementById('homeworkEditModal').style.display = 'flex';
@@ -6562,8 +6718,15 @@
             showToast('✅ 作业更新成功！');
         }
 
-        function deleteHomework(id) {
-            showConfirmDialog('确定要删除这个作业吗？此操作无法撤销。', () => {
+        async function deleteHomework(id) {
+            const confirmed = await showConfirmDialog(
+                '⚠️ 确认删除', 
+                '确定要删除这个作业吗？此操作无法撤销。', 
+                '确认删除', 
+                '取消'
+            );
+            
+            if (confirmed) {
                 const cls = getCurrentClass();
                 if (!cls) return showToast('未找到当前班级！');
                 
@@ -6575,35 +6738,19 @@
                 globalData.homeworks[cls.id] = globalData.homeworks[cls.id].filter(hw => hw.id !== id);
                 
                 // 保存数据
-                saveData();
+                await saveDataImmediately();
                 
                 // 更新统计和列表
                 updateHomeworkStats();
                 renderHomeworkList();
                 
                 showToast('✅ 作业删除成功！');
-            });
-        }
-        
-        let confirmCallback = null;
-        
-        function showConfirmDialog(message, callback) {
-            confirmCallback = callback;
-            document.getElementById('confirmMessage').innerText = message;
-            document.getElementById('confirmDialog').style.display = 'flex';
-        }
-        
-        function closeConfirmDialog(confirmed) {
-            document.getElementById('confirmDialog').style.display = 'none';
-            if (confirmed && confirmCallback) {
-                confirmCallback();
             }
-            confirmCallback = null;
         }
-
+        
         let homeworkCurrentPage = 1;
-        const homeworkPageSize = 6;
         let homeworkFilterDateValue = '';
+        let homeworkAutoPageSize = 12;
         
         function getTodayDateString() {
             const today = new Date();
@@ -6612,12 +6759,13 @@
             const day = String(today.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
-        
-        let homeworkShowAll = false;
 
         function renderHomeworkList() {
             const cls = getCurrentClass();
             if (!cls) return;
+            
+            // 初始化日期筛选为当天
+            initHomeworkFilterDate();
             
             const homeworkList = document.getElementById('homeworkList');
             if (!homeworkList) return;
@@ -6644,7 +6792,7 @@
                     const hwDateStr = `${year}-${month}-${day}`;
                     return hwDateStr === homeworkFilterDateValue;
                 });
-            } else if (!homeworkShowAll) {
+            } else {
                 // 默认只显示当天的作业
                 homeworks = homeworks.filter(hw => {
                     if (!hw.assignTime) return false;
@@ -6664,15 +6812,12 @@
                 return;
             }
             
-            // 分页计算
-            const totalPages = Math.ceil(homeworks.length / homeworkPageSize);
-            const startIndex = (homeworkCurrentPage - 1) * homeworkPageSize;
-            const endIndex = startIndex + homeworkPageSize;
-            const paginatedHomeworks = homeworks.slice(startIndex, endIndex);
+            // 隐藏分页控件（改为滚动查看）
+            document.getElementById('homeworkPagination').innerHTML = '';
             
-            // 按布置日期分组
+            // 按布置日期分组（显示所有作业，不分页）
             const groupedHomeworks = {};
-            paginatedHomeworks.forEach(homework => {
+            homeworks.forEach(homework => {
                 let dateStr = '未知日期';
                 if (homework.assignTime) {
                     const date = new Date(homework.assignTime);
@@ -6759,9 +6904,6 @@
             });
             
             homeworkList.innerHTML = html;
-            
-            // 渲染分页控件
-            renderHomeworkPagination(totalPages);
         }
         
         function renderHomeworkPagination(totalPages) {
@@ -6774,19 +6916,43 @@
             let html = '';
             
             // 上一页按钮
-            html += `<button onclick="goToHomeworkPage(${homeworkCurrentPage - 1})" ${homeworkCurrentPage === 1 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} style="padding: 8px 16px; border-radius: 8px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer;">上一页</button>`;
+            html += `<button onclick="goToHomeworkPage(${homeworkCurrentPage - 1})" ${homeworkCurrentPage === 1 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} style="padding: 6px 12px; border-radius: 6px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer; font-size: 12px;">上一页</button>`;
             
-            // 页码按钮
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === homeworkCurrentPage) {
-                    html += `<button style="padding: 8px 16px; border-radius: 8px; border: none; background: var(--primary); color: white; font-weight: bold;">${i}</button>`;
-                } else {
-                    html += `<button onclick="goToHomeworkPage(${i})" style="padding: 8px 16px; border-radius: 8px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer;">${i}</button>`;
+            // 页码按钮（优化：只显示部分页码）
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, homeworkCurrentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            // 如果有省略，显示第一页
+            if (startPage > 1) {
+                html += `<button onclick="goToHomeworkPage(1)" style="padding: 6px 10px; border-radius: 6px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer; font-size: 12px;">1</button>`;
+                if (startPage > 2) {
+                    html += `<span style="padding: 6px; color: #9CA3AF;">...</span>`;
                 }
             }
             
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === homeworkCurrentPage) {
+                    html += `<button style="padding: 6px 12px; border-radius: 6px; border: none; background: var(--primary); color: white; font-weight: bold; font-size: 12px;">${i}</button>`;
+                } else {
+                    html += `<button onclick="goToHomeworkPage(${i})" style="padding: 6px 10px; border-radius: 6px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer; font-size: 12px;">${i}</button>`;
+                }
+            }
+            
+            // 如果有省略，显示最后一页
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<span style="padding: 6px; color: #9CA3AF;">...</span>`;
+                }
+                html += `<button onclick="goToHomeworkPage(${totalPages})" style="padding: 6px 10px; border-radius: 6px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer; font-size: 12px;">${totalPages}</button>`;
+            }
+            
             // 下一页按钮
-            html += `<button onclick="goToHomeworkPage(${homeworkCurrentPage + 1})" ${homeworkCurrentPage === totalPages ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} style="padding: 8px 16px; border-radius: 8px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer;">下一页</button>`;
+            html += `<button onclick="goToHomeworkPage(${homeworkCurrentPage + 1})" ${homeworkCurrentPage === totalPages ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} style="padding: 6px 12px; border-radius: 6px; border: none; background: #E5E7EB; color: #374151; font-weight: bold; cursor: pointer; font-size: 12px;">下一页</button>`;
             
             pagination.innerHTML = html;
         }
@@ -6808,7 +6974,8 @@
                     const hwDateStr = `${year}-${month}-${day}`;
                     return hwDateStr === homeworkFilterDateValue;
                 });
-            } else if (!homeworkShowAll) {
+            } else {
+                // 默认显示今日
                 homeworks = homeworks.filter(hw => {
                     if (!hw.assignTime) return false;
                     const assignDate = new Date(hw.assignTime);
@@ -6821,7 +6988,7 @@
                 });
             }
             
-            const totalPages = Math.ceil(homeworks.length / homeworkPageSize);
+            const totalPages = Math.ceil(homeworks.length / homeworkAutoPageSize);
             
             if (page < 1 || page > totalPages) return;
             
@@ -6832,7 +6999,6 @@
         function filterHomeworkByDate() {
             const dateInput = document.getElementById('homeworkFilterDate');
             homeworkFilterDateValue = dateInput.value;
-            homeworkShowAll = true;
             homeworkCurrentPage = 1;
             updateHomeworkFilterUI();
             renderHomeworkList();
@@ -6840,46 +7006,30 @@
         
         function clearHomeworkFilter() {
             const dateInput = document.getElementById('homeworkFilterDate');
-            if (dateInput) dateInput.value = '';
-            homeworkFilterDateValue = '';
-            homeworkShowAll = false;
+            const today = getTodayDateString();
+            if (dateInput) dateInput.value = today;
+            homeworkFilterDateValue = today;
             homeworkCurrentPage = 1;
             updateHomeworkFilterUI();
             renderHomeworkList();
         }
         
-        function toggleShowAllHomework() {
-            homeworkShowAll = !homeworkShowAll;
-            homeworkFilterDateValue = '';
+        function initHomeworkFilterDate() {
             const dateInput = document.getElementById('homeworkFilterDate');
-            if (dateInput) dateInput.value = '';
-            homeworkCurrentPage = 1;
-            updateHomeworkFilterUI();
-            renderHomeworkList();
+            if (dateInput && !dateInput.value) {
+                const today = getTodayDateString();
+                dateInput.value = today;
+                homeworkFilterDateValue = today;
+            }
         }
         
         function updateHomeworkFilterUI() {
             const hint = document.getElementById('homeworkFilterHint');
-            const btn = document.getElementById('showAllHomeworkBtn');
             
             if (homeworkFilterDateValue) {
                 if (hint) hint.textContent = `（筛选: ${homeworkFilterDateValue}）`;
-                if (btn) {
-                    btn.textContent = '显示全部';
-                    btn.style.background = 'var(--primary)';
-                }
-            } else if (homeworkShowAll) {
-                if (hint) hint.textContent = '（全部）';
-                if (btn) {
-                    btn.textContent = '仅显示今日';
-                    btn.style.background = '#EF4444';
-                }
             } else {
                 if (hint) hint.textContent = '（今日）';
-                if (btn) {
-                    btn.textContent = '显示全部';
-                    btn.style.background = 'var(--primary)';
-                }
             }
         }
 
@@ -7556,12 +7706,100 @@
             if (!cls) return showToast('未找到当前班级！');
             if (!cls.students) cls.students = [];
             if(cls.students.length === 0) return showToast('本班已经没有学生了');
-            if(confirm(`🚨 警告：确定要一键清空【${cls.name}】的所有学生吗？此操作不可逆！`)) {
+            
+            // 使用自定义确认对话框
+            const confirmed = await showConfirmDialog(
+                '🚨 警告', 
+                `确定要一键清空【${cls.name}】的所有学生吗？\n此操作不可逆！`, 
+                '确认清空', 
+                '取消'
+            );
+            
+            if (confirmed) {
                 cls.students = []; 
-                await saveData(); 
+                console.log('清空学生数据，准备保存...');
+                await saveDataImmediately(); 
                 renderStudents(); 
                 showToast('✅ 已清空该班级所有学生');
+                console.log('清空学生数据完成');
             }
+        }
+        
+        // 自定义确认对话框
+        function showConfirmDialog(title, message, confirmText, cancelText) {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 99999;
+                `;
+                
+                const dialog = document.createElement('div');
+                dialog.style.cssText = `
+                    background: white;
+                    padding: 24px;
+                    border-radius: 16px;
+                    max-width: 400px;
+                    width: 90%;
+                    text-align: center;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                `;
+                
+                dialog.innerHTML = `
+                    <h3 style="margin: 0 0 16px 0; font-size: 20px; color: #EF4444;">${title}</h3>
+                    <p style="margin: 0 0 24px 0; font-size: 16px; color: #374151; white-space: pre-line;">${message}</p>
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button id="confirmCancel" style="
+                            padding: 12px 24px;
+                            border: 1px solid #D1D5DB;
+                            border-radius: 8px;
+                            background: white;
+                            color: #374151;
+                            font-size: 16px;
+                            cursor: pointer;
+                            flex: 1;
+                        ">${cancelText}</button>
+                        <button id="confirmOk" style="
+                            padding: 12px 24px;
+                            border: none;
+                            border-radius: 8px;
+                            background: #EF4444;
+                            color: white;
+                            font-size: 16px;
+                            cursor: pointer;
+                            flex: 1;
+                        ">${confirmText}</button>
+                    </div>
+                `;
+                
+                overlay.appendChild(dialog);
+                document.body.appendChild(overlay);
+                
+                dialog.querySelector('#confirmOk').onclick = () => {
+                    document.body.removeChild(overlay);
+                    resolve(true);
+                };
+                
+                dialog.querySelector('#confirmCancel').onclick = () => {
+                    document.body.removeChild(overlay);
+                    resolve(false);
+                };
+                
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        document.body.removeChild(overlay);
+                        resolve(false);
+                    }
+                };
+            });
         }
         
         async function batchAdoptDefaultPet() {
@@ -7593,7 +7831,11 @@
             const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
             grid.innerHTML = '';
             let list = getCurrentStudents().filter(s => s.name.toLowerCase().includes(keyword));
-            list.sort((a,b) => b.exp - a.exp); 
+            list.sort((a,b) => {
+                const numA = parseInt(a.studentId) || 0;
+                const numB = parseInt(b.studentId) || 0;
+                return numA - numB;
+            }); 
 
             list.forEach(student => {
                 const petInfo = getPetInfo(student); 
@@ -7646,6 +7888,7 @@
                 
                 const card = document.createElement('div'); 
                 card.className = `student-card ${isSelected ? 'selected' : ''}`;
+                card.setAttribute('data-student-id', student.id);
                 card.onclick = (e) => {
                     if (e.target.closest('button') || e.target.closest('.pet-display') || e.target.closest('.coin-display')) return; 
                     if (isBatchMode) {
@@ -7943,7 +8186,11 @@
             
             grid.innerHTML = '';
             const cls = getCurrentClass();
-            const students = cls.students;
+            if (!cls) {
+                console.warn('renderGroupManage: 没有找到当前班级');
+                return;
+            }
+            const students = cls.students || [];
             
             // 确保size属性存在且有效
             if (!groupCardSettings.size || isNaN(groupCardSettings.size)) {
@@ -8230,9 +8477,87 @@
             });
             openModal('adoptModal');
         }
-        async function confirmAdopt(speciesId) {
+        
+        let adoptSaveTimer = null;
+        function confirmAdopt(speciesId) {
             const stu = getCurrentStudents().find(s => s.id === targetStudentId);
-            stu.speciesId = speciesId; await saveData(); renderStudents(); closeModal('adoptModal'); showToast('🎉 宠物绑定成功！');
+            if (!stu) return;
+            
+            stu.speciesId = speciesId;
+            
+            // 延迟保存，避免快速点击时频繁保存
+            clearTimeout(adoptSaveTimer);
+            adoptSaveTimer = setTimeout(async () => {
+                await saveData();
+            }, 500);
+            
+            // 只更新当前学生的卡片，而不是重新渲染所有学生
+            updateStudentCard(targetStudentId);
+            
+            closeModal('adoptModal');
+            showToast('🎉 宠物绑定成功！');
+        }
+        
+        // 单独更新某个学生的卡片（优化性能）
+        function updateStudentCard(studentId) {
+            const card = document.querySelector(`[data-student-id="${studentId}"]`);
+            if (!card) {
+                renderStudents();
+                return;
+            }
+            
+            const student = getCurrentStudents().find(s => s.id === studentId);
+            if (!student) return;
+            
+            const pet = getPetInfo(student);
+            
+            // 更新宠物图片区域
+            const petDisplay = card.querySelector('.pet-display');
+            if (petDisplay) {
+                if (pet.img) {
+                    petDisplay.innerHTML = `
+                        <div class="pet-glow"></div>
+                        <img src="${pet.img}" class="pet-custom-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="pet-emoji" style="display:none;">${pet.emoji}</div>
+                    `;
+                } else {
+                    petDisplay.innerHTML = `
+                        <div class="pet-glow"></div>
+                        <div class="pet-emoji">${pet.emoji}</div>
+                    `;
+                }
+            }
+            
+            // 更新宠物名称
+            const petStageName = card.querySelector('.pet-stage-name');
+            if (petStageName) {
+                petStageName.textContent = pet.name;
+            }
+            
+            // 更新等级徽章
+            const levelBadge = card.querySelector('.level-badge');
+            if (levelBadge) {
+                const exp = Number(student.exp) || 0;
+                const t = globalData.thresholds;
+                const stageThresholds = [
+                    { stage: 1, min: 0, max: t.stage2 - 1, name: '一阶' },
+                    { stage: 2, min: t.stage2, max: t.stage3 - 1, name: '二阶' },
+                    { stage: 3, min: t.stage3, max: t.stage4 - 1, name: '三阶' },
+                    { stage: 4, min: t.stage4, max: t.stage5 - 1, name: '四阶' },
+                    { stage: 5, min: t.stage5, max: t.stage6 - 1, name: '五阶' },
+                    { stage: 6, min: t.stage6, max: t.stage7 - 1, name: '六阶' },
+                    { stage: 7, min: t.stage7, max: t.stage8 - 1, name: '七阶' },
+                    { stage: 8, min: t.stage8, max: Infinity, name: '八阶' }
+                ];
+                let currentStage = stageThresholds[0];
+                for (let i = 0; i < stageThresholds.length; i++) {
+                    if (exp >= stageThresholds[i].min && exp <= stageThresholds[i].max) {
+                        currentStage = stageThresholds[i];
+                        break;
+                    }
+                }
+                levelBadge.textContent = currentStage.name;
+            }
         }
 
         function updateSpeciesSelector() {
@@ -8622,6 +8947,32 @@
             event.target.value = '';
         }
 
+        // 积分排行视图模式：'top10' 或 'all'
+        let rankViewMode = 'top10';
+        
+        function switchRankView(mode) {
+            rankViewMode = mode;
+            
+            // 更新按钮样式
+            const top10Btn = document.getElementById('rankTop10Btn');
+            const allBtn = document.getElementById('rankAllBtn');
+            
+            if (mode === 'top10') {
+                top10Btn.style.background = 'var(--primary)';
+                top10Btn.style.color = 'white';
+                allBtn.style.background = '#E5E7EB';
+                allBtn.style.color = '#374151';
+            } else {
+                allBtn.style.background = 'var(--primary)';
+                allBtn.style.color = 'white';
+                top10Btn.style.background = '#E5E7EB';
+                top10Btn.style.color = '#374151';
+            }
+            
+            // 重新渲染排行
+            renderRankings();
+        }
+
         function renderRankings() {
             // 渲染本班积分排行
             const pList = document.getElementById('personalRankList'); 
@@ -8629,7 +8980,13 @@
                 pList.innerHTML = '';
                 const currentStudents = getCurrentStudents();
                 // 按可用积分排序
-                let sortedStus = [...currentStudents].sort((a,b) => (b.exp || 0) - (a.exp || 0)).slice(0, 10);
+                let sortedStus = [...currentStudents].sort((a,b) => (b.exp || 0) - (a.exp || 0));
+                
+                // 根据视图模式决定显示数量
+                if (rankViewMode === 'top10') {
+                    sortedStus = sortedStus.slice(0, 10);
+                }
+                
                 sortedStus.forEach((s, idx) => {
                     const pet = getPetInfo(s); 
                     let rankCls = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : '';
@@ -8856,17 +9213,53 @@
             reader.readAsText(file);
         }
         async function processAddStudents() {
-            const text = document.getElementById('studentsInput').value; let count = 0; const cls = getCurrentClass();
+            const text = document.getElementById('studentsInput').value;
+            let count = 0;
+            const cls = getCurrentClass();
             const defaultSpeciesId = globalData.petSpecies[0].id;
-            text.split('\n').forEach(line => {
-                const parts = line.trim().split(/[\t,， ]+/); if(parts.length === 0 || !parts[0]) return;
-                const studentId = parts[0];
-                const name = parts.length > 1 ? parts[1] : '';
+            
+            text.split('\n').forEach((line, index) => {
+                const parts = line.trim().split(/[\t,， ]+/);
+                if (parts.length === 0 || !parts[0]) return;
+                
+                const studentNumber = parts[0].trim();
+                const name = parts.length > 1 ? parts[1].trim() : '';
                 if (!name) return;
-                cls.students.push({ id: 'stu_' + Date.now() + Math.random().toString(16).substr(2,4), name: name, studentId: studentId, group: '', exp: 0, avail: 0, history: [], speciesId: defaultSpeciesId, dimensions: { kindness: 0, discipline: 0, energy: 0, wisdom: 0 } }); 
+                
+                // 检查是否已存在相同学号的学生
+                const existingStudent = cls.students.find(s => s.studentId === studentNumber);
+                if (existingStudent) {
+                    console.log(`学号 ${studentNumber} 已存在，跳过添加`);
+                    return;
+                }
+                
+                // 使用学号作为ID的一部分，确保唯一性
+                const uniqueId = 'stu_' + studentNumber + '_' + Date.now();
+                
+                cls.students.push({
+                    id: uniqueId,
+                    name: name,
+                    studentId: studentNumber,
+                    group: '',
+                    exp: 0,
+                    avail: 0,
+                    history: [],
+                    speciesId: defaultSpeciesId,
+                    dimensions: { kindness: 0, discipline: 0, energy: 0, wisdom: 0 }
+                });
+                
+                console.log(`添加学生: ID=${uniqueId}, 学号=${studentNumber}, 姓名=${name}`);
                 count++;
             });
-            if(count>0) { await saveData(); renderStudents(); if(document.getElementById('groupManageView').classList.contains('active')) renderGroupManage(); closeModal('addStudentModal'); document.getElementById('studentsInput').value=''; showToast(`✅ 成功录入 ${count} 份档案并分配基础宠物`); }
+            
+            if (count > 0) {
+                await saveData();
+                renderStudents();
+                if (document.getElementById('groupManageView').classList.contains('active')) renderGroupManage();
+                closeModal('addStudentModal');
+                document.getElementById('studentsInput').value = '';
+                showToast(`✅ 成功录入 ${count} 份档案并分配基础宠物`);
+            }
         }
         
         // 导出学生数据
@@ -8923,7 +9316,16 @@
         }
 
         function openScoreModal(studentId, mode, customTitleStr = null) {
-            targetStudentId = studentId; currentScoreMode = mode;
+            console.log('=== openScoreModal START ===');
+            console.log('Input studentId:', studentId);
+            console.log('All students:', getCurrentStudents().map(s => ({ id: s.id, name: s.name })));
+            
+            targetStudentId = studentId; 
+            currentScoreMode = mode;
+            
+            console.log('Set targetStudentId to:', targetStudentId);
+            console.log('=== openScoreModal END ===');
+            
             if (!studentId && selectedStudentIds.size === 0) return showToast('请先勾选学生！');
             
             let title = mode === 'add' ? '🌟 发放奖励' : '⚠️ 记录违纪';
@@ -9030,6 +9432,8 @@
 
         // 快速加分/扣分（读取饱食度联动选项）
         function applyQuickScore(reason, amount, dimension) {
+            console.log('applyQuickScore called:', { reason, amount, dimension, currentScoreMode });
+            
             let satiationChange = 0;
             let expChange = amount;
             const linkSatiationCheck = document.getElementById('linkSatiationCheck');
@@ -9043,6 +9447,8 @@
                     satiationChange = -satiationChange;
                 }
             }
+            
+            console.log('applyQuickScore values:', { expChange, satiationChange, linkSatiationChecked: linkSatiationCheck?.checked });
             
             applyScore(reason, expChange, dimension, satiationChange);
         }
@@ -9080,6 +9486,14 @@
             let targets = targetStudentId ? [targetStudentId] : Array.from(selectedStudentIds);
             const timeStr = new Date().toLocaleString(); const cls = getCurrentClass();
             
+            console.log('applyScore called:', { 
+                targetStudentId, 
+                targets, 
+                amount, 
+                satiationChange,
+                currentClassId: globalData.currentClassId 
+            });
+            
             let finalAmount = amount;
             let eventBonusMessage = '';
             
@@ -9097,10 +9511,33 @@
             }
 
             targets.forEach(id => {
-                const stu = cls.students.find(s => s.id === id); if(!stu.history) stu.history = [];
+                const stu = cls.students.find(s => s.id === id); 
+                console.log('Processing student:', { id, found: !!stu, studentName: stu?.name, studentAvail: stu?.avail });
+                if(!stu.history) stu.history = [];
                 const icon = finalAmount > 0 ? DIM_ICONS[dimension] : '';
-                stu.history.unshift({ time: timeStr, reason: `${icon} ${reason}${eventBonusMessage}`.trim(), amount: finalAmount });
+                
+                // 构建历史记录原因，包含饱食度变化信息
+                let historyReason = `${icon} ${reason}`.trim();
+                if (satiationChange !== 0) {
+                    const satiationPrefix = satiationChange > 0 ? '+' : '';
+                    historyReason += ` (饱食度${satiationPrefix}${satiationChange})`;
+                }
+                if (eventBonusMessage) {
+                    historyReason += eventBonusMessage;
+                }
+                
+                // 记录积分变化到历史
+                stu.history.unshift({ time: timeStr, reason: historyReason, amount: finalAmount });
                 if(stu.history.length > 50) stu.history.pop(); 
+                
+                console.log('Before update:', { 
+                    studentName: stu.name, 
+                    avail: stu.avail, 
+                    exp: stu.exp,
+                    finalAmount: finalAmount,
+                    satiationChange: satiationChange
+                });
+                
                 if (finalAmount > 0) { 
                     // 加分时：积分增加，饱食度根据satiationChange增加（不再重复加finalAmount）
                     stu.avail += finalAmount; 
@@ -9114,6 +9551,12 @@
                     // 饱食度也允许负数
                     stu.exp += satiationChange;
                 }
+                
+                console.log('After update:', { 
+                    studentName: stu.name, 
+                    avail: stu.avail, 
+                    exp: stu.exp
+                });
             });
 
             // 检测是否有宠物跨越了阶段
@@ -9127,7 +9570,7 @@
                 });
             }
 
-            await saveData(); closeModal('scoreModal');
+            await saveDataImmediately(); closeModal('scoreModal');
             if(!targetStudentId && !isBatchMode) selectedStudentIds.clear();
             if(isBatchMode) toggleBatchMode();
 
@@ -9390,20 +9833,44 @@
         }
         
         function openStudentDetail(studentId) {
-            const student = globalData.students.find(s => s.id === studentId);
+            const student = getCurrentStudents().find(s => s.id === studentId);
             if (!student) return;
             
             document.getElementById('studentDetailTitle').innerText = `👨‍🎓 ${student.name} - 个人详情`;
             
             const petInfo = getPetInfo(student);
-            const lv = getStudentLevel(student);
-            const exp = getStudentExp(student);
-            const expNeeded = getExpNeeded(lv);
-            const expProgress = Math.min(100, (exp / expNeeded) * 100);
-            const currentStage = getCurrentStage(lv);
-            const nextStage = getNextStage(lv);
-            const stageColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
-            const progressColor = stageColors[lv - 1] || '#8B5CF6';
+            
+            // 使用正确的计算逻辑
+            const exp = Number(student.exp) || 0;
+            const expToNext = getExpToNextLevel(student);
+            const nextThreshold = expToNext.nextThreshold || exp;
+            const prevThreshold = nextThreshold - (expToNext.expNeeded || 0);
+            const expProgress = expToNext.expNeeded === 0 ? 100 : Math.min(100, Math.max(0, ((exp - prevThreshold) / (nextThreshold - prevThreshold)) * 100));
+            
+            // 计算当前阶段
+            const t = globalData.thresholds;
+            const stageThresholds = [
+                { stage: 1, min: 0, max: t.stage2 - 1, name: '一阶' },
+                { stage: 2, min: t.stage2, max: t.stage3 - 1, name: '二阶' },
+                { stage: 3, min: t.stage3, max: t.stage4 - 1, name: '三阶' },
+                { stage: 4, min: t.stage4, max: t.stage5 - 1, name: '四阶' },
+                { stage: 5, min: t.stage5, max: t.stage6 - 1, name: '五阶' },
+                { stage: 6, min: t.stage6, max: t.stage7 - 1, name: '六阶' },
+                { stage: 7, min: t.stage7, max: t.stage8 - 1, name: '七阶' },
+                { stage: 8, min: t.stage8, max: Infinity, name: '八阶' }
+            ];
+            let currentStage = stageThresholds[0];
+            let nextStage = null;
+            for (let i = 0; i < stageThresholds.length; i++) {
+                if (exp >= stageThresholds[i].min && exp <= stageThresholds[i].max) {
+                    currentStage = stageThresholds[i];
+                    nextStage = stageThresholds[i + 1] || null;
+                    break;
+                }
+            }
+            
+            const stageColors = ['#9CA3AF', '#34D399', '#60A5FA', '#A78BFA', '#FBBF24', '#F97316', '#EF4444', '#8B5CF6'];
+            const progressColor = stageColors[currentStage.stage - 1] || '#8B5CF6';
             
             // 计算最近的积分记录
             const recentRecords = student.history ? student.history.slice(-10).reverse() : [];
@@ -9447,13 +9914,13 @@
                 <div style="background: #F9FAFB; border-radius: 12px; padding: 15px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <div style="font-size: 14px; font-weight: bold; color: #374151;">经验值</div>
-                        <div style="font-size: 12px; color: #6B7280;">${exp}/${expNeeded}</div>
+                        <div style="font-size: 12px; color: #6B7280;">${exp}/${nextThreshold || '满级'}</div>
                     </div>
                     <div style="width: 100%; height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden;">
                         <div style="height: 100%; width: ${expProgress}%; background: linear-gradient(90deg, ${progressColor}, ${progressColor}88); border-radius: 4px; transition: width 0.5s ease;"></div>
                     </div>
                     <div style="margin-top: 8px; font-size: 12px; color: #6B7280;">
-                        ${nextStage ? `距离${nextStage.name}还需${expNeeded - exp}点` : '已满阶!'}
+                        ${nextStage ? `距离${nextStage.name}还需${expToNext.expNeeded}点` : '已满阶!'}
                     </div>
                 </div>
                 
@@ -9501,7 +9968,7 @@
                         <div style="font-size: 32px;">${petInfo.emoji}</div>
                         <div>
                             <div style="font-size: 14px; font-weight: 500;">${petInfo.name}</div>
-                            <div style="font-size: 12px; color: #6B7280;">等级 ${lv}</div>
+                            <div style="font-size: 12px; color: #6B7280;">等级 ${currentStage.stage}</div>
                         </div>
                         <button onclick="openAdopt('${student.id}')" style="margin-left: auto; padding: 6px 12px; border: none; border-radius: 6px; background: #E5E7EB; cursor: pointer; font-size: 12px; font-weight: 500;">
                             🔄 更换宠物
