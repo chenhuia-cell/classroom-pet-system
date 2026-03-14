@@ -4751,8 +4751,9 @@
             <div id="linkSatiationWrapper" style="margin-bottom: 20px; padding: 15px; background: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
                 <label style="display:flex; align-items:center; gap:10px; font-size:14px; font-weight:bold; color:#92400E; cursor:pointer;">
                     <input type="checkbox" id="linkSatiationCheck" checked style="width:18px; height:18px; cursor:pointer;">
-                    <span>🍖 喂食增加饱食度 / 生病扣除饱食度</span>
+                    <span id="linkSatiationLabel">🍖 喂食增加饱食度 / 生病扣除饱食度</span>
                 </label>
+                <div id="linkSatiationHint" style="font-size:12px; color:#B45309; margin-top:8px;">勾选时同时增减经验值，不勾选只增减饱食度</div>
                 <input type="number" id="linkSatiationAmount" placeholder="饱食度数量（默认与积分相同）" style="width:100%; margin-top:10px; padding: 10px; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 14px; display:none;">
             </div>
             
@@ -9005,12 +9006,20 @@
             document.getElementById('linkSatiationCheck').checked = true;
             document.getElementById('linkSatiationAmount').value = '';
             document.getElementById('linkSatiationAmount').style.display = 'none';
+            
+            // 根据模式更新标签文字
+            const label = document.getElementById('linkSatiationLabel');
+            const hint = document.getElementById('linkSatiationHint');
             if (mode === 'add') { 
                 document.getElementById('customDimWrapper').style.display = 'block'; 
                 document.getElementById('customSubmitBtn').style.background = 'linear-gradient(135deg, #34D399, #10B981)'; 
+                if (label) label.innerHTML = '🍖 喂食增加饱食度';
+                if (hint) hint.innerHTML = '勾选时同时增加饱食度，不勾选只增加经验值';
             } else { 
                 document.getElementById('customDimWrapper').style.display = 'none'; 
                 document.getElementById('customSubmitBtn').style.background = 'linear-gradient(135deg, #F87171, #EF4444)'; 
+                if (label) label.innerHTML = '🤒 生病扣除饱食度';
+                if (hint) hint.innerHTML = '勾选时同时扣除饱食度，不勾选只扣除经验值';
             }
             // 绑定复选框事件
             document.getElementById('linkSatiationCheck').onchange = function() {
@@ -9022,7 +9031,11 @@
         // 快速加分/扣分（读取饱食度联动选项）
         function applyQuickScore(reason, amount, dimension) {
             let satiationChange = 0;
+            let expChange = amount;
             const linkSatiationCheck = document.getElementById('linkSatiationCheck');
+            const isDeductMode = currentScoreMode === 'deduct';
+            
+            // 勾选时才变化饱食度，不勾选只增减经验值
             if (linkSatiationCheck && linkSatiationCheck.checked) {
                 const customSatiation = parseInt(document.getElementById('linkSatiationAmount').value);
                 satiationChange = isNaN(customSatiation) || customSatiation === 0 ? Math.abs(amount) : customSatiation;
@@ -9030,7 +9043,8 @@
                     satiationChange = -satiationChange;
                 }
             }
-            applyScore(reason, amount, dimension, satiationChange);
+            
+            applyScore(reason, expChange, dimension, satiationChange);
         }
 
         function submitCustomScore() {
@@ -9039,21 +9053,25 @@
             if(isNaN(amount) || amount === 0) return showToast('请输入正确分值！');
             let dim = 'general';
             let satiationChange = 0;
+            let expChange = 0;
             const linkSatiation = document.getElementById('linkSatiationCheck').checked;
+            const isDeductMode = currentScoreMode === 'deduct';
+            
+            // 勾选时才变化饱食度
             if(linkSatiation) {
                 const customSatiation = parseInt(document.getElementById('linkSatiationAmount').value);
                 satiationChange = isNaN(customSatiation) || customSatiation === 0 ? Math.abs(amount) : customSatiation;
             }
+            
             if(currentScoreMode === 'add') { 
-                amount = Math.abs(amount); 
+                expChange = Math.abs(amount); 
                 dim = document.getElementById('customDim').value; 
-                // 喂食时饱食度增加（satiationChange保持正值）
             } else { 
-                amount = -Math.abs(amount); 
-                // 生病时饱食度减少
-                satiationChange = -satiationChange;
+                // 扣分模式
+                satiationChange = -satiationChange; // 饱食度减少
+                expChange = -Math.abs(amount); // 经验值减少
             }
-            applyScore(reason, amount, dim, satiationChange);
+            applyScore(reason, expChange, dim, satiationChange);
         }
 
 
