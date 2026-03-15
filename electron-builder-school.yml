@@ -1,0 +1,19 @@
+appId: com.classroom.pet.manager.school
+productName: 班级积分管理系统宠物版-学校版
+directories:
+  output: dist-school
+files:
+  - index.html
+  - electron-main-school.js
+  - pet/**/*
+  - package.json
+extraResources:
+  - from: pet
+    to: pet
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+        - ia32
+electronVersion: 22.3.27

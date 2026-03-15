@@ -1,58 +1,97 @@
 const { app, BrowserWindow, Menu, ipcMain, screen } = require('electron');
 const path = require('path');
+const fs = require('fs');
+
+// 创建日志文件用于调试
+const logFile = path.join(__dirname, 'app-debug.log');
+function log(message) {
+    const timestamp = new Date().toISOString();
+    const logMessage = `[${timestamp}] ${message}\n`;
+    fs.appendFileSync(logFile, logMessage);
+    console.log(logMessage);
+}
+
+log('应用启动');
+log(`Electron版本: ${process.versions.electron}`);
+log(`Node版本: ${process.versions.node}`);
+log(`Chrome版本: ${process.versions.chrome}`);
+log(`平台: ${process.platform}`);
+log(`架构: ${process.arch}`);
 
 // Windows 7/8 兼容性设置
 app.commandLine.appendSwitch('disable-features', 'VizDisplayCompositor');
 app.commandLine.appendSwitch('disable-gpu-compositing');
 app.commandLine.appendSwitch('disable-gpu-rasterization');
 
+// 禁用GPU加速（解决某些显卡兼容问题）
+app.disableHardwareAcceleration();
+
+log('已应用兼容性设置');
+
 // 保持窗口对象的全局引用，防止被垃圾回收
 let mainWindow;
 let floatBallWindow = null;
 
 function createWindow() {
-    // 创建浏览器窗口
-    mainWindow = new BrowserWindow({
-        width: 1400,
-        height: 900,
-        minWidth: 1200,
-        minHeight: 700,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            enableRemoteModule: true
-        },
-        icon: path.join(__dirname, 'pet', '仓鼠', '1.png'),
-        title: '班级积分管理系统宠物版',
-        show: false // 先不显示，等加载完成后再显示
-    });
-
-    // 加载应用
-    mainWindow.loadFile('index.html');
-
-    // 开发工具（可选）
-    // mainWindow.webContents.openDevTools();
-
-    // 窗口加载完成后显示
-    mainWindow.once('ready-to-show', () => {
-        mainWindow.show();
-    });
-
-    // 窗口关闭时触发
-    mainWindow.on('closed', function () {
-        mainWindow = null;
-        // 主窗口关闭时，关闭悬浮球
-        if (floatBallWindow) {
-            floatBallWindow.close();
-            floatBallWindow = null;
-        }
-    });
-
-    // 创建菜单
-    createMenu();
+    log('开始创建主窗口');
     
-    // 创建悬浮球窗口
-    createFloatBallWindow();
+    try {
+        // 创建浏览器窗口
+        mainWindow = new BrowserWindow({
+            width: 1400,
+            height: 900,
+            minWidth: 1200,
+            minHeight: 700,
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false,
+                enableRemoteModule: true,
+                webSecurity: false  // 禁用web安全策略（解决某些学校网络限制）
+            },
+            icon: path.join(__dirname, 'pet', '仓鼠', '1.png'),
+            title: '班级积分管理系统宠物版',
+            show: false // 先不显示，等加载完成后再显示
+        });
+        
+        log('主窗口创建成功');
+
+        // 加载应用
+        mainWindow.loadFile('index.html');
+        log('开始加载index.html');
+
+        // 窗口加载完成后显示
+        mainWindow.once('ready-to-show', () => {
+            log('窗口准备就绪，开始显示');
+            mainWindow.show();
+            log('窗口已显示');
+        });
+        
+        // 监听加载失败
+        mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+            log(`页面加载失败: ${errorCode} - ${errorDescription}`);
+        });
+
+        // 窗口关闭时触发
+        mainWindow.on('closed', function () {
+            log('主窗口关闭');
+            mainWindow = null;
+            // 主窗口关闭时，关闭悬浮球
+            if (floatBallWindow) {
+                floatBallWindow.close();
+                floatBallWindow = null;
+            }
+        });
+
+        // 创建菜单
+        createMenu();
+        
+        // 创建悬浮球窗口
+        createFloatBallWindow();
+        
+    } catch (error) {
+        log(`创建窗口错误: ${error.message}`);
+        log(`错误堆栈: ${error.stack}`);
+    }
 }
 
 // 创建桌面悬浮球窗口
@@ -339,28 +378,45 @@ function createMenu() {
 }
 
 // Electron 初始化完成
-app.whenReady().then(createWindow);
+log('等待Electron就绪...');
+app.whenReady().then(() => {
+    log('Electron已就绪');
+    createWindow();
+}).catch(err => {
+    log(`Electron就绪失败: ${err.message}`);
+});
 
 // 所有窗口关闭时退出应用
 app.on('window-all-closed', function () {
+    log('所有窗口关闭');
     if (process.platform !== 'darwin') {
         app.quit();
     }
 });
 
 app.on('activate', function () {
+    log('应用激活');
     if (mainWindow === null) {
         createWindow();
     }
 });
 
+// 应用退出
+app.on('quit', () => {
+    log('应用退出');
+});
+
 // 防止多开实例
+log('请求单实例锁...');
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
+    log('已有实例运行，退出');
     app.quit();
 } else {
+    log('获得单实例锁');
     app.on('second-instance', (event, commandLine, workingDirectory) => {
+        log('检测到第二个实例启动');
         if (mainWindow) {
             if (mainWindow.isMinimized()) {
                 mainWindow.restore();

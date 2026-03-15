@@ -1,0 +1,49 @@
+{
+  "name": "classroom-pet-manager",
+  "version": "3.8.0-school",
+  "description": "班级积分管理系统宠物版 - 学校专用兼容版",
+  "main": "electron-main-school.js",
+  "scripts": {
+    "start": "electron .",
+    "build:school": "electron-builder --win --x64 --ia32"
+  },
+  "keywords": [
+    "classroom",
+    "management",
+    "pet",
+    "education"
+  ],
+  "author": "班级积分管理系统",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "22.3.27",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.classroom.pet.manager.school",
+    "productName": "班级积分管理系统宠物版-学校版",
+    "directories": {
+      "output": "dist-school"
+    },
+    "files": [
+      "index.html",
+      "electron-main-school.js",
+      "pet/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "pet",
+        "to": "pet"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64", "ia32"]
+        }
+      ]
+    }
+  }
+}
