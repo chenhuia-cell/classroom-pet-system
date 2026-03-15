@@ -4985,64 +4985,127 @@
 
         const STAGE_LABELS = { s1: '1阶 (宠物蛋)', s2: '2阶 (破壳期)', s3: '3阶 (幼年期)', s4: '4阶 (探险期)', s5: '5阶 (元素期)', s6: '6阶 (战士期)', s7: '7阶 (魔法期)', s8: '8阶 (神圣期)' };
 
-        // pet 文件夹中的宠物配置 - 自动生成宠物图鉴
-        const PET_FOLDER_SPECIES = [
-            { name: '仓鼠', emoji: '🐹' },
-            { name: '侏儒兔', emoji: '🐰' },
-            { name: '小浣熊', emoji: '🦝' },
-            { name: '小蛇', emoji: '🐍' },
-            { name: '小鸟', emoji: '🐦' },
-            { name: '巴西龟', emoji: '🐢' },
-            { name: '松鼠', emoji: '🐿️' },
-            { name: '橘猫', emoji: '🐱' },
-            { name: '虎皮鹦鹉', emoji: '🦜' },
-            { name: '蜜袋鼯', emoji: '🐭' },
-            { name: '螃蟹', emoji: '🦀' },
-            { name: '螳螂', emoji: '🦗' },
-            { name: '金鱼', emoji: '🐠' },
-            { name: '龙猫', emoji: '🐭' },
-            { name: '运动狗', emoji: '🐕' },
-            { name: '爱心鹿', emoji: '🦌' },
-            { name: '彩虹鸟', emoji: '🐦' },
-            { name: '盾牌熊', emoji: '🐻' },
-            { name: '画笔鸭', emoji: '🦆' },
-            { name: '火箭鼠', emoji: '🚀' },
-            { name: '火焰狐', emoji: '🦊' },
-            { name: '绿叶熊', emoji: '🐻' },
-            { name: '泡泡鱼', emoji: '🐡' },
-            { name: '闪电猫', emoji: '🐱' },
-            { name: '石头怪', emoji: '🗿' },
-            { name: '书本龟', emoji: '🐢' },
-            { name: '水晶蝶', emoji: '🦋' },
-            { name: '太阳狮', emoji: '🦁' },
-            { name: '糖果猪', emoji: '🐷' },
-            { name: '小星星', emoji: '⭐' },
-            { name: '雪花兔', emoji: '🐰' },
-            { name: '音乐鼠', emoji: '🐭' },
-            { name: '月光狼', emoji: '🐺' },
-            { name: '云朵羊', emoji: '🐑' }
-        ];
+        // 宠物系列配置 - 按文件夹结构组织
+        const PET_SERIES_CONFIG = {
+            '兔子系列': {
+                emoji: '🐰',
+                pets: [
+                    { name: '佛州白兔', emoji: '🐰' },
+                    { name: '侏儒兔2', emoji: '🐰' },
+                    { name: '喜马拉雅兔', emoji: '🐰' },
+                    { name: '垂耳兔', emoji: '🐰' },
+                    { name: '安哥拉兔', emoji: '🐰' },
+                    { name: '巨型花明兔', emoji: '🐰' },
+                    { name: '海棠兔', emoji: '🐰' },
+                    { name: '狮子兔', emoji: '🐰' },
+                    { name: '荷兰兔', emoji: '🐰' },
+                    { name: '迷你垂耳兔', emoji: '🐰' },
+                    { name: '雷克斯兔', emoji: '🐰' }
+                ]
+            },
+            '动物世界系列': {
+                emoji: '🌍',
+                pets: [
+                    { name: '仓鼠', emoji: '🐹' },
+                    { name: '侏儒兔', emoji: '🐰' },
+                    { name: '小浣熊', emoji: '🦝' },
+                    { name: '小蛇', emoji: '🐍' },
+                    { name: '小鸟', emoji: '🐦' },
+                    { name: '巴西龟', emoji: '🐢' },
+                    { name: '松鼠', emoji: '🐿️' },
+                    { name: '橘猫', emoji: '🐱' },
+                    { name: '虎皮鹦鹉', emoji: '🦜' },
+                    { name: '蜜袋鼯', emoji: '🐭' },
+                    { name: '螃蟹', emoji: '🦀' },
+                    { name: '螳螂', emoji: '🦗' },
+                    { name: '金鱼', emoji: '🐠' },
+                    { name: '龙猫', emoji: '🐭' }
+                ]
+            },
+            '狗狗系列': {
+                emoji: '🐕',
+                pets: [
+                    { name: '博美', emoji: '🐕' },
+                    { name: '哈士奇', emoji: '🐕' },
+                    { name: '斗牛犬', emoji: '🐕' },
+                    { name: '柯基', emoji: '🐕' },
+                    { name: '腊肠狗', emoji: '🐕' },
+                    { name: '萨摩耶', emoji: '🐕' },
+                    { name: '边牧', emoji: '🐕' },
+                    { name: '金毛', emoji: '🐕' },
+                    { name: '阿拉斯加', emoji: '🐕' }
+                ]
+            },
+            '猫猫系列': {
+                emoji: '🐱',
+                pets: [
+                    { name: '三花', emoji: '🐱' },
+                    { name: '奶牛猫', emoji: '🐱' },
+                    { name: '布偶猫', emoji: '🐱' },
+                    { name: '无毛猫', emoji: '🐱' },
+                    { name: '狮子猫', emoji: '🐱' },
+                    { name: '狸花猫', emoji: '🐱' },
+                    { name: '美短起司', emoji: '🐱' },
+                    { name: '英短蓝猫', emoji: '🐱' },
+                    { name: '黑猫', emoji: '🐱' }
+                ]
+            },
+            '神奇宠物系列': {
+                emoji: '✨',
+                pets: [
+                    { name: '小星星', emoji: '⭐' },
+                    { name: '火箭鼠', emoji: '🚀' },
+                    { name: '盾牌熊', emoji: '🐻' },
+                    { name: '爱心鹿', emoji: '🦌' },
+                    { name: '运动狗', emoji: '🐕' },
+                    { name: '画笔鸭', emoji: '🦆' },
+                    { name: '书本龟', emoji: '🐢' },
+                    { name: '糖果猪', emoji: '🐷' },
+                    { name: '音乐鼠', emoji: '🐭' },
+                    { name: '水晶蝶', emoji: '🦋' },
+                    { name: '石头怪', emoji: '🗿' },
+                    { name: '云朵羊', emoji: '🐑' },
+                    { name: '太阳狮', emoji: '🦁' },
+                    { name: '月光狼', emoji: '🐺' },
+                    { name: '彩虹鸟', emoji: '🐦' },
+                    { name: '绿叶熊', emoji: '🐻' },
+                    { name: '闪电猫', emoji: '🐱' },
+                    { name: '雪花兔', emoji: '🐰' },
+                    { name: '火焰狐', emoji: '🦊' },
+                    { name: '泡泡鱼', emoji: '🐡' }
+                ]
+            }
+        };
 
-        // 从 pet 文件夹生成宠物种类数据
+        // 从 pet 文件夹生成宠物种类数据（支持系列结构）
         function generatePetSpeciesFromFolder() {
-            return PET_FOLDER_SPECIES.map((pet, index) => {
-                const stages = {};
-                for (let i = 1; i <= 8; i++) {
-                    const stageKey = 's' + i;
-                    stages[stageKey] = {
-                        name: DEFAULT_STAGES_TEMPLATE[stageKey].name,
-                        stage: DEFAULT_STAGES_TEMPLATE[stageKey].stage,
-                        emoji: pet.emoji,
-                        img: `./pet/${pet.name}/${i}.png`
-                    };
-                }
-                return {
-                    id: `species_pet_${String(index + 1).padStart(2, '0')}`,
-                    name: pet.name,
-                    desc: `可爱的${pet.name}宠物系列`,
-                    stages: stages
-                };
-            });
+            let speciesList = [];
+            let index = 0;
+            
+            for (const [seriesName, seriesData] of Object.entries(PET_SERIES_CONFIG)) {
+                seriesData.pets.forEach(pet => {
+                    const stages = {};
+                    for (let i = 1; i <= 8; i++) {
+                        const stageKey = 's' + i;
+                        stages[stageKey] = {
+                            name: DEFAULT_STAGES_TEMPLATE[stageKey].name,
+                            stage: DEFAULT_STAGES_TEMPLATE[stageKey].stage,
+                            emoji: pet.emoji,
+                            img: `./pet/${seriesName}/${pet.name}/${i}.png`
+                        };
+                    }
+                    speciesList.push({
+                        id: `species_pet_${String(index + 1).padStart(3, '0')}`,
+                        name: pet.name,
+                        series: seriesName,
+                        desc: `${seriesName} - 可爱的${pet.name}`,
+                        stages: stages
+                    });
+                    index++;
+                });
+            }
+            
+            return speciesList;
         }
 
         // DOM加载完成后绑定事件监听器
