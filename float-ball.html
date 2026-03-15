@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-app-region: no-drag;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+        }
+        
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        /* 悬浮球主体 */
+        .float-ball {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 
+                0 8px 32px rgba(102, 126, 234, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            font-size: 26px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .float-ball::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 30%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .float-ball:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 
+                0 12px 40px rgba(102, 126, 234, 0.5),
+                0 6px 20px rgba(0, 0, 0, 0.15),
+                inset 0 2px 4px rgba(255, 255, 255, 0.4);
+        }
+        
+        .float-ball:active {
+            transform: scale(0.95);
+        }
+        
+        .float-ball.dragging {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+        
+        /* 脉动动画 */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 
+                    0 8px 32px rgba(102, 126, 234, 0.4),
+                    0 4px 16px rgba(0, 0, 0, 0.1),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 
+                    0 12px 40px rgba(102, 126, 234, 0.6),
+                    0 6px 20px rgba(0, 0, 0, 0.15),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.4);
+            }
+        }
+        
+        .float-ball.pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* 图标 */
+        .ball-icon {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease;
+        }
+        
+        .float-ball:hover .ball-icon {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="float-ball pulse" id="floatBall">
+        <span class="ball-icon" id="ballIcon">🐾</span>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        const floatBall = document.getElementById('floatBall');
+        const ballIcon = document.getElementById('ballIcon');
+        
+        let isMouseDown = false;
+        let hasMoved = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let lastClickTime = 0;
+        const CLICK_THRESHOLD = 5;
+        const DOUBLE_CLICK_TIME = 300;
+        
+        // 鼠标按下
+        floatBall.addEventListener('mousedown', (e) => {
+            isMouseDown = true;
+            hasMoved = false;
+            
+            dragStartX = e.screenX;
+            dragStartY = e.screenY;
+            
+            floatBall.classList.add('dragging');
+            floatBall.classList.remove('pulse');
+            
+            ipcRenderer.send('float-ball-drag-start', { x: e.screenX, y: e.screenY });
+        });
+        
+        // 鼠标移动
+        document.addEventListener('mousemove', (e) => {
+            if (!isMouseDown) return;
+            
+            const dx = Math.abs(e.screenX - dragStartX);
+            const dy = Math.abs(e.screenY - dragStartY);
+            
+            if (dx > CLICK_THRESHOLD || dy > CLICK_THRESHOLD) {
+                hasMoved = true;
+            }
+            
+            ipcRenderer.send('float-ball-drag-move', { x: e.screenX, y: e.screenY });
+        });
+        
+        // 鼠标抬起
+        document.addEventListener('mouseup', (e) => {
+            if (!isMouseDown) return;
+            
+            isMouseDown = false;
+            floatBall.classList.remove('dragging');
+            floatBall.classList.add('pulse');
+            
+            ipcRenderer.send('float-ball-drag-end');
+            
+            if (hasMoved) return;
+            
+            const now = Date.now();
+            const timeSinceLastClick = now - lastClickTime;
+            
+            if (timeSinceLastClick < DOUBLE_CLICK_TIME) {
+                // 双击
+                ballIcon.textContent = '✨';
+                setTimeout(() => ballIcon.textContent = '🐾', 300);
+                ipcRenderer.send('float-ball-action', 'show-main-window');
+                lastClickTime = 0;
+            } else {
+                lastClickTime = now;
+                setTimeout(() => {
+                    if (lastClickTime === now) {
+                        // 单击
+                        ballIcon.textContent = '💤';
+                        setTimeout(() => ballIcon.textContent = '🐾', 300);
+                        ipcRenderer.send('float-ball-action', 'minimize-main-window');
+                        lastClickTime = 0;
+                    }
+                }, DOUBLE_CLICK_TIME);
+            }
+        });
+        
+        // 禁用右键
+        floatBall.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+    </script>
+</body>
+</html>

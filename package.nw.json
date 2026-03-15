@@ -1,0 +1,45 @@
+{
+  "name": "classroom-pet-manager",
+  "version": "3.8.0",
+  "description": "班级积分管理系统宠物版 - NW.js 桌面应用",
+  "main": "index.html",
+  "window": {
+    "title": "班级积分管理系统宠物版",
+    "icon": "pet/仓鼠/1.png",
+    "width": 1400,
+    "height": 900,
+    "min_width": 1200,
+    "min_height": 700,
+    "position": "center",
+    "resizable": true,
+    "show_in_taskbar": true,
+    "frame": true,
+    "kiosk": false,
+    "transparent": false,
+    "fullscreen": false
+  },
+  "webkit": {
+    "plugin": true,
+    "java": false,
+    "page-cache": false
+  },
+  "nodejs": true,
+  "node-remote": "*",
+  "chromium-args": "--enable-logging --v=1 --disable-web-security --allow-file-access-from-files",
+  "js-flags": "--expose-gc",
+  "dom_storage_quota": 1024,
+  "additional_trust_anchors": [],
+  "user-agent": "ClassroomPetManager/3.8.0 NW.js/%ver/%osinfo",
+  "scripts": {
+    "start": "nw .",
+    "build": "nwbuild -p win64,osx64,linux64 .",
+    "build:win": "nwbuild -p win64 .",
+    "build:mac": "nwbuild -p osx64 .",
+    "build:linux": "nwbuild -p linux64 ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "nw": "^0.82.0",
+    "nw-builder": "^4.7.0"
+  }
+}

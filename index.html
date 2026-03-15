@@ -4077,7 +4077,7 @@
                     <button data-tab="petboard">🖼️ 宠物图鉴库定制</button>
                     <button data-tab="settings">📝 积分规则与商店</button>
                     <div style="border-top: 1px solid #E5E7EB; margin: 4px 0;"></div>
-                    <button onclick="switchToFloatBall()">🌐 切换到悬浮球</button>
+                    <!-- <button onclick="switchToFloatBall()">🌐 切换到悬浮球</button> -->
                     <div style="border-top: 1px solid #E5E7EB; margin: 4px 0;"></div>
                     <button onclick="document.getElementById('globalImportInput').click()">📂 导入全局备份数据</button>
                     <button onclick="exportData()">💾 导出全局备份数据</button>
@@ -4185,7 +4185,7 @@
                 </div>
             </div>
             <div style="width: 100%; max-width: 1200px; margin: 12px auto 0; font-size: 13px; opacity: 0.9; line-height: 1.5;">
-                ✨ 全校共享此图鉴库 | 点击宠物区域上传专属图片 | <strong>💡 提示：如图片无法显示，请使用 VS Code Live Server 插件运行，或点击"🚀 批量导入"按钮导入图片</strong>
+                ✨ 全校共享此图鉴库 | 点击宠物区域上传专属图片 | <strong>💡 提示：如图片无法显示，或点击"🚀 批量导入"按钮导入图片</strong>
             </div>
         </div>
         <main class="main-content-scroll" style="padding: 24px;">
@@ -6205,6 +6205,12 @@
             renderHomeworkList();
             updateHomeworkStats();
             
+            // 如果作业大屏正在显示，刷新大屏
+            const dashboardOverlay = document.getElementById('homeworkDashboardOverlay');
+            if (dashboardOverlay && dashboardOverlay.style.display === 'flex') {
+                openHomeworkDashboard(homeworkId);
+            }
+            
             showToast('✅ 已将所有学生标记为已交！');
         }
 
@@ -7919,6 +7925,13 @@
                     </div>
                 `;
                 
+                // 检查积分是否为负数
+                const availScore = Number(student.avail) || 0;
+                const isNegativeScore = availScore < 0;
+                
+                // 如果积分为负数，使用 guale 图片
+                const petImgSrc = isNegativeScore ? 'pet/guale.png' : petInfo.img;
+                
                 if (!student.speciesId) {
                     // 未领养状态
                     html += `
@@ -7930,10 +7943,25 @@
                 } else {
                     // 已领养状态 - 宠物展示区
                     html += `
+                        ${isNegativeScore ? `
+                        <div class="scroll-text-container" style="text-align: center; margin-bottom: 8px; height: 56px; overflow: hidden; position: relative;">
+                            <div class="scroll-text" style="animation: scrollUp 3s ease-in-out infinite; color: #EF4444; font-size: 18px; font-weight: bold; line-height: 28px;">
+                                <div>我的小伙伴请努力</div>
+                                <div>等我回来</div>
+                            </div>
+                        </div>
+                        <style>
+                            @keyframes scrollUp {
+                                0%, 30% { transform: translateY(0); }
+                                50%, 80% { transform: translateY(-28px); }
+                                100% { transform: translateY(0); }
+                            }
+                        </style>
+                        ` : ''}
                         <div class="pet-display" onclick="openScoreModal('${student.id}', 'add')" title="点击喂食">
                             <div class="pet-glow"></div>
-                            ${petInfo.img ? 
-                                `<img src="${petInfo.img}" class="pet-custom-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            ${petImgSrc ? 
+                                `<img src="${petImgSrc}" class="pet-custom-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                  <div class="pet-emoji" style="display:none;">${petInfo.emoji}</div>` : 
                                 `<div class="pet-emoji">${petInfo.emoji}</div>`
                             }

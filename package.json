@@ -1,0 +1,110 @@
+{
+  "name": "classroom-pet-manager",
+  "version": "3.8.0",
+  "description": "班级积分管理系统宠物版 - 桌面应用",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --publish=never",
+    "nw": "nw .",
+    "nw:build": "nwbuild -p win64,osx64,linux64 ."
+  },
+  "keywords": [
+    "classroom",
+    "management",
+    "pet",
+    "education",
+    "electron",
+    "nwjs"
+  ],
+  "author": "班级积分管理系统",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^22.3.27",
+    "electron-builder": "^24.9.1",
+    "nw": "^0.82.0",
+    "nw-builder": "^4.7.0"
+  },
+  "build": {
+    "appId": "com.classroom.pet.manager",
+    "productName": "班级积分管理系统宠物版",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "index.html",
+      "electron-main.js",
+      "pet/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "pet",
+        "to": "pet"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.education"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Education"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "班级积分管理系统宠物版"
+    }
+  },
+  "nwBuilder": {
+    "version": "0.82.0",
+    "platforms": [
+      "win64",
+      "osx64",
+      "linux64"
+    ],
+    "flavor": "normal",
+    "buildDir": "dist-nwjs",
+    "cacheDir": "cache-nwjs",
+    "macIcns": "pet/仓鼠/1.png"
+  }
+}

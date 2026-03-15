@@ -1,9 +1,23 @@
-# 系统文件
+# 依赖目录
+node_modules/
+
+# 打包输出目录
+dist-electron/
+dist-win7-compat/
+dist-nwjs/
+
+# 缓存目录
+cache-nwjs/
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 操作系统文件
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# 编辑器
+# IDE配置
 .vscode/
 .idea/
 *.swp
@@ -12,15 +26,3 @@ desktop.ini
 # 临时文件
 *.tmp
 *.temp
-*.log
-
-# 依赖目录
-node_modules/
-
-# 构建输出
-dist/
-build/
-
-# 环境配置
-.env
-.env.local

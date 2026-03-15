@@ -1,0 +1,26 @@
+appId: com.classroom.pet.manager
+productName: 班级积分管理系统宠物版
+directories:
+  output: dist-win7-compat
+files:
+  - index.html
+  - electron-main.js
+  - float-ball.html
+  - pet/**/*
+  - package.json
+extraResources:
+  - from: pet
+    to: pet
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+        - ia32
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 班级积分管理系统宠物版
+electronVersion: 22.3.27
