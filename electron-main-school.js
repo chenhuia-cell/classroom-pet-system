@@ -41,6 +41,18 @@ app.disableHardwareAcceleration();
 
 log('已应用学校兼容性设置');
 
+// 全局错误处理 - 防止权限错误导致程序崩溃
+process.on('uncaughtException', (error) => {
+    log(`未捕获的异常: ${error.message}`);
+    log(`错误堆栈: ${error.stack}`);
+    // 不退出程序，继续运行
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    log(`未处理的Promise拒绝: ${reason}`);
+    // 不退出程序，继续运行
+});
+
 // 保持窗口对象的全局引用
 let mainWindow;
 let floatBallWindow = null;
